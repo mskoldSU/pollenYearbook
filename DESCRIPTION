@@ -1,0 +1,37 @@
+Package: pollenYearbook
+Type: Package
+Title: Functions for Palynological Lab yearly reporting
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Martin", "Sköld",
+      email = "martin.skold@nrm.se",
+      role = c("aut", "cre")
+    )
+  )
+Description: Functions for Palynological Lab yearly reporting
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 4.1.0)
+Imports:
+    DBI,
+    RSQLite,
+    purrr (>= 1.0.0),
+    dplyr (>= 1.1.0),
+    flextable,
+    forcats,
+    ggplot2 (>= 3.5.0),
+    grid,
+    lubridate,
+    scales,
+    slider,
+    stats,
+    stringr,
+    tibble,
+    tidyr
+Suggests:
+    roxygen2
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.0

@@ -1,0 +1,17 @@
+# Generated datasets are refreshed by update_data().
+/data/
+
+# Local databases and dumps.
+*.sqlite
+*.sqlite-*
+*.sql
+*.sql.gz
+
+# Local R session files and generated reports.
+.Rhistory
+.RData
+.Rproj.user/
+*_cache/
+*.docx
+*.html
+*.pdf

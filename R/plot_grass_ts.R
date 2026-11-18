@@ -56,8 +56,8 @@ plot_grass_ts <- function(report_year,
     theme_bw(base_size = text_size) +
     geom_line(aes(x = date, color = swe_name,  y = sqrt(roll))) +
     labs(x = "", y = "Pollenhalt", color = NULL) +
-    scale_y_continuous(breaks = sqrt(c(0, 10, 30, 100)),
-                       labels = c("0", "10", "30", "100"), expand = expansion(c(0, NA))) +
+    scale_y_continuous(breaks = sqrt(c(0, 10, 30, 80)),
+                       labels = c("0", "10", "30", "80"), expand = expansion(c(0, NA))) +
     theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
           panel.grid.major.y = element_line(color = "black", linewidth = .1),
           axis.text.x = element_text(angle = 90, hjust = .5, vjust = .5),
@@ -68,9 +68,9 @@ plot_grass_ts <- function(report_year,
           ) +
     geom_text(data = tibble(
       x = as.Date(start_date),
-      y = c(1.6, 4.3, 7.7, 12.6),
+      y = c(1.6, 4.2, 7.2, 11),
       label = c("Låga halter", "Måttliga halter", "Höga halter", "Mycket höga halter")),
       aes(x = x, y = y, label = label), size = 3, hjust = 0, vjust = 0) +
     scale_x_date(breaks = date_breaks, labels = date_labels, expand = expansion(0, 0)) +
-    coord_cartesian(ylim = c(0, 50/sqrt(10)))
+    coord_cartesian(ylim = c(0, 45/sqrt(10)))
 }

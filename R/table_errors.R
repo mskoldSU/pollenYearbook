@@ -60,7 +60,7 @@ table_errors <- function(data, error_year){
     mk_par(j = c("bars"),
            value = as_paragraph(gg_chunk(value = ., height = .15, width = 1)),
            use_dot = TRUE) |>
-    set_header_labels(bars = "Driftstörningar") |>
+    set_header_labels(bars = "Driftprofil") |>
     set_table_properties(layout = "autofit")  |>
     fontsize(size = 8, part = "all") |>
     padding(padding.top = 0, padding.bottom = 0)

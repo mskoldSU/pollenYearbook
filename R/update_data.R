@@ -147,70 +147,107 @@ update_data <- function(database, package_dir = ".", lib = .libPaths()[1L],
 
 
 
-  df <- tibble(
-    Grupp = c(
-      rep("Träd", 7),
-      rep("Gräs och örter", 3),
-      rep("Mögelsporer", 3)
+
+df <- tibble(
+  Grupp = c(
+    rep("Träd", 7),
+    rep("Gräs och örter", 3),
+    rep("Mögelsporer", 3)
+  ),
+  Taxon = c(
+    "Al (Alnus)",
+    "Alm (Ulmus)",
+    "Björk (Betula)",
+    "Bok (Fagus)",
+    "Ek (Quercus)",
+    "Hassel (Corylus)",
+    "Viden (Salix)",
+    "Gråbo (Artemisia)",
+    "Gräs (Poaceae)",
+    "Malörtsambrosia (Ambrosia)",
+    "Alternaria",
+    "Epicoccum",
+    "Cladosporium"
+  ),
+  Låga = c(rep("1–10", 7), rep("1–10", 3),
+           "1–20", "1–20", "1–2000"),
+  Måttliga = c(rep("11–100", 7), rep("11–30", 3),
+               "21–100", "21–100", "2001–4000"),
+  Höga = c(rep("101–1000", 7),
+           "31–80", "31–80", "31–80",
+           "101–1000", "101–1000", "4001–10000"),
+  `Mycket höga` = c(rep(">1000", 7), rep(">80", 3),
+                    ">1000", ">1000", ">10000")
+)
+
+df2 <- df |>
+  dplyr::group_by(Grupp) |>
+  dplyr::group_modify(~ bind_rows(
+    tibble(
+      Taxon = unique(.y$Grupp),
+      Låga = "", Måttliga = "", Höga = "", `Mycket höga` = "",
+      is_group = TRUE
     ),
-    Taxon = c(
-      "Al (Alnus)",
-      "Alm (Ulmus)",
-      "Björk (Betula)",
-      "Bok (Fagus)",
-      "Ek (Quercus)",
-      "Hassel (Corylus)",
-      "Viden (Salix)",
-      "Gråbo (Artemisia)",
-      "Gräs (Poaceae)",
-      "Malörtsambrosia (Ambrosia)",
-      "Alternaria",
-      "Epicoccum",
-      "Cladosporium"
-    ),
-    Låga = c(rep("1–10", 7), rep("1–10", 3), "1–20","1–20", "1–2000"),
-    Måttliga = c(rep("11–100", 7), rep("11–30", 3), "21–100", "21–100", "2001–4000"),
-    Höga = c(rep("101–1000", 7), "31–100", "31–80", "31–100", "101–1000","101–1000", "4001–10000"),
-    `Mycket höga` = c(rep(">1000", 7), rep(">100", 3), ">1000", ">1000", ">10000")
+    mutate(.x, is_group = FALSE)
+  )) |>
+  ungroup() |>
+  mutate(n = dplyr::n(), .by = "Grupp") |>
+  arrange(-n)
+
+# Rows requiring partial or complete italics
+genus_rows <- which(
+  !df2$is_group &
+    grepl("\\(", df2$Taxon) &
+    !grepl("\\(Poaceae\\)", df2$Taxon)
+)
+
+mould_rows <- which(
+  !df2$is_group &
+    !grepl("\\(", df2$Taxon)
+)
+
+ft <- flextable::flextable(
+  df2 |> select(-Grupp, -is_group, -n)
+) |>
+  set_header_labels(
+    Taxon = "Halter:",
+    Låga = "låga",
+    Måttliga = "måttliga",
+    Höga = "höga",
+    `Mycket höga` = "mycket höga"
+  ) |>
+  flextable::theme_booktabs() |>
+  flextable::compose(
+    i = genus_rows,
+    j = "Taxon",
+    value = flextable::as_paragraph(
+      flextable::as_chunk(
+        sub("\\([^)]*\\)$", "(", Taxon)
+      ),
+      flextable::as_i(
+        sub("^.*\\(([^)]*)\\)$", "\\1", Taxon)
+      ),
+      flextable::as_chunk(")")
+    )
+  ) |>
+  flextable::italic(
+    i = mould_rows,
+    j = "Taxon"
   )
 
-  df2 <- df |>
-    dplyr::group_by(Grupp) |>
-    dplyr::group_modify(~ bind_rows(
-      tibble(
-        Taxon = unique(.y$Grupp),
-        Låga = "", Måttliga = "", Höga = "", `Mycket höga` = "",
-        is_group = TRUE
-      ),
-      mutate(.x, is_group = FALSE)
-    )) |>
-    ungroup() |>
-    mutate(n = dplyr::n(), .by = "Grupp") |>
-    arrange(-n)
+# Group formatting
+group_rows <- which(df2$is_group)
 
+ft <- purrr::reduce(
+  group_rows,
+  .init = ft,
+  .f = ~ flextable::merge_at(.x, i = .y, j = 1:5)
+) |>
+  flextable::bold(i = group_rows, bold = TRUE) |>
+  flextable::align(i = group_rows, align = "left", part = "body") |>
+  flextable::autofit()
 
-  ft <- flextable::flextable(df2 |> select(-Grupp, -is_group, -n)) |>
-    set_header_labels(
-      Taxon = "Halter:",
-      Låga = "låga",
-      Måttliga = "måttliga",
-      Höga = "höga",
-      `Mycket höga` = "mycket höga"
-    ) |>
-    flextable::theme_booktabs() |>
-    autofit()
-
-  group_rows <- which(df2$is_group)
-
-  ft <- purrr::reduce(
-    group_rows,
-    .init = ft,
-    .f = ~ flextable::merge_at(.x, i = .y, j = 1:5)
-  ) |>
-    flextable::bold(i = group_rows, bold = TRUE) |>
-    flextable::align(i = group_rows, align = "left", part = "body")
-
-  levels_tab <- ft
+levels_tab <- ft
 
 
   datasets <- list(stations = stations, daily_conc = daily_conc, pollen = pollen,

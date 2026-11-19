@@ -138,7 +138,9 @@ update_data <- function(database, package_dir = ".", lib = .libPaths()[1L],
            conc = ifelse(count == 0, 0, count * factor),
            station = fct_reorder(station, lat)) |>
     left_join(pollen, by = c("species" = "lat_name")) |>
-    select(station, year, lat, long, date, species, swe_name, conc, is_error)
+    select(station, year, lat, long, date, species, swe_name, conc, is_error) |>
+    filter(!((station == "Gävle") & (year == 2026))) |>
+    mutate(station = dplyr::if_else(station == "Gävle Högskola 2", "Gävle", station))
 
 
 

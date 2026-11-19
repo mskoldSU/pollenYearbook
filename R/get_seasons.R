@@ -18,7 +18,7 @@ get_seasons <- function(data, species, year, cutoff = .025){
   filter_species <- species
   data |> filter(year == filter_year, species == filter_species, !is.na(conc)) |>
     arrange(station, date) |>
-    mutate(cum_conc = cumsum(conc) / sum(conc),
+    mutate(cum_conc = cumsum(conc) / max(sum(conc), 1),
            season = case_when(cum_conc <= cutoff ~ "pre_season",
                               cum_conc >= (1 - cutoff) ~ "post_season",
                               TRUE ~ "season"),
@@ -28,11 +28,11 @@ get_seasons <- function(data, species, year, cutoff = .025){
            start = min(date, na.rm = TRUE),
            end = max(date, na.rm = TRUE),
            .by = c("station")) |>
-    filter(season == "season") |>
-    summarise(season_start = min(date),
-              season_end = max(date),
+    #filter(season == "season") |>
+    summarise(season_start = dplyr::if_else(sum(conc) > 0, max(date[season == "pre_season"] + 1), NA),
+              season_end = dplyr::if_else(sum(conc) > 0, max(min(date[season == "post_season"]) - 1, season_start), NA),
               year_max = year_max[1],
-              date_max = date_max[1],
+              date_max = dplyr::if_else(sum(conc) > 0, date_max[1], NA),
               total = total[1],
               start = start[1],
               end = end[1],

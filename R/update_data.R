@@ -140,7 +140,7 @@ update_data <- function(database, package_dir = ".", lib = .libPaths()[1L],
     left_join(pollen, by = c("species" = "lat_name")) |>
     select(station, year, lat, long, date, species, swe_name, conc, is_error) |>
     filter(!((station == "Gävle") & (year == 2026))) |>
-    mutate(station = dplyr::if_else(station == "Gävle Högskola 2", "Gävle", station))
+    mutate(station = forcats::fct_collapse(station, Gävle = c("Gävle Högskola 2", "Gävle")))
 
 
 

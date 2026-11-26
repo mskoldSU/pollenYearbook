@@ -13,8 +13,8 @@ table_seasons <- function(data, species, report_year, cutoff = .025){
   this_year <- get_seasons(data, species, report_year, cutoff) |> mutate(year = year(start))
   last_year <- get_seasons(data, species, report_year - 1, cutoff)  |> mutate(year = year(start))
 
-  first_start <- round(quantile(yday(c(this_year$season_start, last_year$season_start)), .25) * .8)
-  last_end <- round(quantile(yday(c(this_year$season_end, last_year$season_end)), .75) * 1.2)
+  first_start <- round(quantile(yday(c(this_year$season_start, last_year$season_start)), .25, na.rm = TRUE) * .8)
+  last_end <- round(quantile(yday(c(this_year$season_end, last_year$season_end)), .75, na.rm = TRUE) * 1.2)
 
   table_years <- c(report_year -1, report_year)
 

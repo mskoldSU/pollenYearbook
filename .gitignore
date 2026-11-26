@@ -1,5 +1,6 @@
-# Generated datasets are refreshed by update_data().
-/data/
+# Daily concentrations are generated locally.
+/data/daily_conc.rda
+/daily_conc.rds
 
 # Local databases and dumps.
 *.sqlite

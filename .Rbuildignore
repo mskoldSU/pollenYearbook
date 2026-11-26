@@ -1,3 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+
+^daily_conc\.rds$
+^data/daily_conc\.rda$

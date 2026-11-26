@@ -2,51 +2,34 @@
 % Please edit documentation in R/update_data.R
 \name{update_data}
 \alias{update_data}
-\title{Refresh and reinstall annual report datasets from SQLite}
+\title{Refresh local daily concentrations from SQLite}
 \usage{
-update_data(
-  database,
-  package_dir = ".",
-  lib = .libPaths()[1L],
-  reinstall = TRUE
-)
+update_data(database, output = "daily_conc.rds")
 }
 \arguments{
 \item{database}{Path to an existing SQLite database containing the data,
 pollen, station, season, and teknisktfel tables used by the reporting system.}
 
-\item{package_dir}{Path to the pollenYearbook source package. Defaults to the
-current directory; an installed package directory is not a source checkout.}
-
-\item{lib}{Destination library for installation. Defaults to the first R
-library. It must already exist and be writable when reinstall is TRUE.}
-
-\item{reinstall}{Whether to reinstall after saving the datasets. Set FALSE
-to refresh source data without installing.}
+\item{output}{File in which to save daily concentrations, defaulting to
+daily_conc.rds in the working directory. Its parent directory must exist.}
 }
 \value{
-Invisibly, a named list containing stations, daily_conc, pollen,
-swe_month, and levels_tab.
+Invisibly, the daily concentration data frame saved to output.
 }
 \description{
-Rebuild the five bundled reporting datasets using a SQLite database and
-optionally reinstall the source package into an R library.
+Rebuild daily reporting concentrations without changing or reinstalling the
+package. Supporting tables remain bundled with pollenYearbook.
 }
 \details{
-The database is opened read-only and disconnected on exit. All
-transformations finish before datasets are saved to package_dir/data.
-Existing datasets of those names are overwritten; other datasets are kept.
-In-season dates without counts become zero, while technical-error flags
-are retained. Cladosporium conversion factors are 26 through 2011 and 12
-thereafter, following the original refresh script.
-
-Installation uses a temporary copy of package sources, excluding report
-outputs and database dumps. An installation failure raises an error; the
-refreshed source datasets remain available for retrying. Restart R after
-reinstalling to use the refreshed data in an already loaded package.
+The database is opened read-only and disconnected on exit. Existing
+output is overwritten after all transformations finish. In-season dates
+without counts become zero; technical-error flags are retained.
+Cladosporium conversion factors are 26 through 2011 and 12 thereafter.
+Load the saved file with readRDS() in the reporting template.
 }
 \examples{
 \dontrun{
-update_data("current.sqlite", package_dir = ".")
+update_data("current.sqlite")
+daily_conc <- readRDS("daily_conc.rds")
 }
 }
